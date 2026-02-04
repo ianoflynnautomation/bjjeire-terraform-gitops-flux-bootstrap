@@ -8,6 +8,27 @@ DESCRIPTION
   nullable    = false
 }
 
+variable "environment" {
+  type        = string
+  description = "dev, staging, or prod"
+}
+
+variable "private_email" {
+  type        = string
+  description = "private_email"
+  sensitive   = true
+}
+
+variable "location_short_name" {
+  type        = string
+  default     = "swn"
+  description = <<DESCRIPTION
+(Optional) The location/region short name where the resources are created. Changing this forces a new resource to be created.
+DESCRIPTION
+  nullable    = false
+}
+
+
 variable "flux_registry" {
   type        = string
   default     = "ghcr.io/fluxcd"
