@@ -12,7 +12,9 @@ on:
       working_directory:
         type: string
         default: "."
-
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
