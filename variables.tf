@@ -73,25 +73,6 @@ DESCRIPTION
   }
 }
 
-variable "github_app_id" {
-  description = "GitHub App ID"
-  type        = string
-  default     = ""
-}
-
-variable "github_app_installation_id" {
-  description = "GitHub App Installation ID"
-  type        = string
-  default     = ""
-}
-
-variable "github_app_pem" {
-  description = "The contents of the GitHub App private key PEM file"
-  sensitive   = true
-  type        = string
-  default     = ""
-}
-
 variable "git_url" {
   type        = string
   nullable    = false
@@ -207,11 +188,4 @@ variable "aks_cluster_name" {
 variable "resource_group_name" {
   type        = string
   description = "The resource group where the resources will be deployed."
-}
-
-
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) Tags of the resource."
 }

@@ -1,7 +1,7 @@
 name: "Terraform Quality"
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       terraform_version:
         type: string
@@ -12,13 +12,9 @@ on:
       working_directory:
         type: string
         default: "."
-    outputs:
-      fmt_outcome:
-        description: "Format check result"
-        value: ${{ jobs.quality.outputs.fmt_outcome }}
-      validate_outcome:
-        description: "Validate result"
-        value: ${{ jobs.quality.outputs.validate_outcome }}
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -71,7 +67,6 @@ jobs:
         id: lint
         working-directory: ${{ inputs.working_directory }}
         run: tflint --recursive --format=compact --no-color
-        continue-on-error: true
 
       - name: Comment Quality Results on PR
         if: always() && github.event_name == 'pull_request'
