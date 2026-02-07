@@ -76,3 +76,4 @@ instance:
               metadata:
                 labels:
                   azure.workload.identity/use: "true"
+                    
