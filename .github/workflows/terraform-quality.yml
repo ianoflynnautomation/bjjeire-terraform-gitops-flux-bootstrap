@@ -67,7 +67,6 @@ jobs:
         id: lint
         working-directory: ${{ inputs.working_directory }}
         run: tflint --recursive --format=compact --no-color
-        continue-on-error: true
 
       - name: Comment Quality Results on PR
         if: always() && github.event_name == 'pull_request'
