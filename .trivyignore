@@ -1,0 +1,6 @@
+# ============================================================
+# Trivy ignore rules for bjjeire-terraform-azurerm-aks
+# ============================================================
+# Each entry suppresses a known false-positive or an accepted
+# risk. Justifications are documented inline.
+# ============================================================
