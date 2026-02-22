@@ -36,16 +36,20 @@ resource "kubernetes_config_map_v1" "cluster_config" {
   }
 
   data = {
-    CLUSTER_REGION        = data.azurerm_kubernetes_cluster.aks.location
-    CLUSTER_ID            = data.azurerm_kubernetes_cluster.aks.name
-    RESOURCE_GROUP        = data.azurerm_kubernetes_cluster.aks.resource_group_name
-    CLUSTER_DOMAIN        = var.cluster_domain
-    KEY_VAULT_NAME        = data.azurerm_key_vault.kv.name
-    TENANT_ID             = data.azurerm_client_config.current.tenant_id
-    AZURE_SUBSCRIPTION_ID = data.azurerm_client_config.current.subscription_id
-    PRIVATE_EMAIL         = var.private_email
+    CLUSTER_REGION             = data.azurerm_kubernetes_cluster.aks.location
+    CLUSTER_ID                 = data.azurerm_kubernetes_cluster.aks.name
+    RESOURCE_GROUP             = data.azurerm_kubernetes_cluster.aks.resource_group_name
+    CLUSTER_DOMAIN             = var.cluster_domain
+    KEY_VAULT_NAME             = data.azurerm_key_vault.kv.name
+    TENANT_ID                  = data.azurerm_client_config.current.tenant_id
+    AZURE_SUBSCRIPTION_ID      = data.azurerm_client_config.current.subscription_id
+    PRIVATE_EMAIL              = var.private_email
+    OAUTH2_PROXY_CLIENT_ID     = data.azuread_application.oauth2_proxy.client_id
+    OAUTH2_PROXY_ALLOWED_GROUP = var.oauth2_proxy_allowed_group_id
   }
 }
+
+
 
 resource "kubernetes_config_map_v1" "workload_identity_config" {
   metadata {
@@ -58,6 +62,7 @@ resource "kubernetes_config_map_v1" "workload_identity_config" {
     EXTERNAL_SECRETS_CLIENT_ID = data.azurerm_user_assigned_identity.external_secrets_identity.client_id
   }
 }
+
 
 resource "helm_release" "flux_operator" {
   name             = "flux-operator"

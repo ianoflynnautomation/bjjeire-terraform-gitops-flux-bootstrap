@@ -189,3 +189,8 @@ variable "resource_group_name" {
   type        = string
   description = "The resource group where the resources will be deployed."
 }
+
+variable "oauth2_proxy_allowed_group_id" {
+  type        = string
+  description = "The Azure Entra ID security group Object ID that is allowed to access observability tools via OAuth2 Proxy."
+}

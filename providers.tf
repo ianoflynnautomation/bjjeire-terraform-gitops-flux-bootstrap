@@ -22,3 +22,7 @@ provider "helm" {
     cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.aks.kube_admin_config[0].cluster_ca_certificate)
   }
 }
+
+provider "azuread" {}
+
+provider "random" {}

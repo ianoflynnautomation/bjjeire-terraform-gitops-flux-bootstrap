@@ -4,5 +4,7 @@ terraform {
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 3.0.1" }
     helm       = { source = "hashicorp/helm", version = "~> 3.1.1" }
     azurerm    = { source = "hashicorp/azurerm", version = "~> 4.57.0" }
+    azuread    = { source = "hashicorp/azuread", version = "~> 3.1.0" }
+    random     = { source = "hashicorp/random", version = "~> 3.6.0" }
   }
 }

@@ -21,4 +21,6 @@ data "azurerm_user_assigned_identity" "external_secrets_identity" {
   resource_group_name = var.resource_group_name
 }
 
-
+data "azuread_application" "oauth2_proxy" {
+  display_name = "oauth2-proxy-${var.aks_cluster_name}"
+}
