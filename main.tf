@@ -15,15 +15,16 @@ resource "kubernetes_namespace_v1" "flux_system" {
 }
 
 
-resource "kubernetes_secret_v1" "flux_github_token" {
+resource "kubernetes_secret_v1" "flux_github_app" {
   metadata {
     name      = "flux-system"
     namespace = kubernetes_namespace_v1.flux_system.metadata[0].name
   }
 
   data = {
-    username = "git"
-    password = var.github_token
+    githubAppID             = data.azurerm_key_vault_secret.github_app_id.value
+    githubAppInstallationID = data.azurerm_key_vault_secret.github_app_installation_id.value
+    githubAppPrivateKey     = data.azurerm_key_vault_secret.github_app_private_key.value
   }
 
   type = "Opaque"
@@ -108,6 +109,6 @@ resource "helm_release" "flux_instance" {
   ]
   depends_on = [
     helm_release.flux_operator,
-    kubernetes_secret_v1.flux_github_token
+    kubernetes_secret_v1.flux_github_app
   ]
 }

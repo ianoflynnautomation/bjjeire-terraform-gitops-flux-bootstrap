@@ -24,3 +24,18 @@ data "azurerm_user_assigned_identity" "external_secrets_identity" {
 data "azuread_application" "oauth2_proxy" {
   display_name = "oauth2-proxy-${var.aks_cluster_name}"
 }
+
+data "azurerm_key_vault_secret" "github_app_id" {
+  name         = "github-app-id"
+  key_vault_id = data.azurerm_key_vault.kv.id
+}
+
+data "azurerm_key_vault_secret" "github_app_installation_id" {
+  name         = "github-app-installation-id"
+  key_vault_id = data.azurerm_key_vault.kv.id
+}
+
+data "azurerm_key_vault_secret" "github_app_private_key" {
+  name         = "github-app-private-key"
+  key_vault_id = data.azurerm_key_vault.kv.id
+}

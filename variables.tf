@@ -173,11 +173,6 @@ variable "subscription_id" {
   type        = string
 }
 
-variable "github_token" {
-  type        = string
-  description = "The GitHub Flux/Runner Controller access token."
-  sensitive   = true
-}
 
 variable "aks_cluster_name" {
   type        = string
