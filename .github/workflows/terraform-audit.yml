@@ -2,11 +2,11 @@ name: terraform-audit
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - "**.tf"
   pull_request:
-    branches: [ main ]
+    branches: [main]
     paths:
       - "**.tf"
   workflow_dispatch:
@@ -21,9 +21,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tfsec:
-    name: Run tfsec sarif report
-    runs-on: ubuntu-latest
+  trivy:
+    name: Run Trivy Terraform SARIF report
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.2
