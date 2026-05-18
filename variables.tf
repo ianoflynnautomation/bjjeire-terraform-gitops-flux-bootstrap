@@ -189,10 +189,3 @@ variable "oauth2_proxy_allowed_group_id" {
   type        = string
   description = "The Azure Entra ID security group Object ID that is allowed to access observability tools via OAuth2 Proxy."
 }
-
-variable "cloudflare_api_token" {
-  type        = string
-  description = "cloudflare api token"
-  default     = null
-  sensitive   = true
-}

@@ -14,7 +14,6 @@ resource "kubernetes_namespace_v1" "flux_system" {
   }
 }
 
-
 resource "kubernetes_secret_v1" "flux_github_app" {
   metadata {
     name      = "flux-system"
@@ -47,7 +46,6 @@ resource "kubernetes_config_map_v1" "cluster_config" {
     PRIVATE_EMAIL              = var.private_email
     OAUTH2_PROXY_CLIENT_ID     = data.azuread_application.oauth2_proxy.client_id
     OAUTH2_PROXY_ALLOWED_GROUP = var.oauth2_proxy_allowed_group_id
-    CLOUDFLARE_API_TOKEN       = var.cloudflare_api_token
   }
 }
 
