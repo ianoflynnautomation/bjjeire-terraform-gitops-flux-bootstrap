@@ -1,12 +1,10 @@
-
 locals {
-  flux_namespace = "flux-system"
+  kubernetes_secret_type_opaque = "Opaque"
 }
-
 
 resource "kubernetes_namespace_v1" "flux_system" {
   metadata {
-    name = local.flux_namespace
+    name = var.flux_namespace
   }
 
   lifecycle {
@@ -16,7 +14,7 @@ resource "kubernetes_namespace_v1" "flux_system" {
 
 resource "kubernetes_secret_v1" "flux_github_app" {
   metadata {
-    name      = "flux-system"
+    name      = var.flux_github_app_secret_name
     namespace = kubernetes_namespace_v1.flux_system.metadata[0].name
   }
 
@@ -26,12 +24,12 @@ resource "kubernetes_secret_v1" "flux_github_app" {
     githubAppPrivateKey     = data.azurerm_key_vault_secret.github_app_private_key.value
   }
 
-  type = "Opaque"
+  type = local.kubernetes_secret_type_opaque
 }
 
 resource "kubernetes_config_map_v1" "cluster_config" {
   metadata {
-    name      = "cluster-config"
+    name      = var.cluster_config_configmap_name
     namespace = kubernetes_namespace_v1.flux_system.metadata[0].name
   }
 
@@ -49,11 +47,9 @@ resource "kubernetes_config_map_v1" "cluster_config" {
   }
 }
 
-
-
 resource "kubernetes_config_map_v1" "workload_identity_config" {
   metadata {
-    name      = "workload-identity-config"
+    name      = var.workload_identity_configmap_name
     namespace = kubernetes_namespace_v1.flux_system.metadata[0].name
   }
 
@@ -63,16 +59,15 @@ resource "kubernetes_config_map_v1" "workload_identity_config" {
   }
 }
 
-
 resource "helm_release" "flux_operator" {
-  name             = "flux-operator"
+  name             = var.flux_operator_release_name
   namespace        = kubernetes_namespace_v1.flux_system.metadata[0].name
-  repository       = "oci://ghcr.io/controlplaneio-fluxcd/charts"
-  chart            = "flux-operator"
+  repository       = var.flux_chart_repository
+  chart            = var.flux_operator_chart_name
   create_namespace = false
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = 600
+  wait             = var.flux_helm_wait
+  wait_for_jobs    = var.flux_helm_wait_for_jobs
+  timeout          = var.flux_helm_timeout_seconds
 
   depends_on = [
     kubernetes_namespace_v1.flux_system
@@ -80,14 +75,14 @@ resource "helm_release" "flux_operator" {
 }
 
 resource "helm_release" "flux_instance" {
-  name             = "flux"
+  name             = var.flux_instance_release_name
   namespace        = kubernetes_namespace_v1.flux_system.metadata[0].name
-  repository       = "oci://ghcr.io/controlplaneio-fluxcd/charts"
-  chart            = "flux-instance"
+  repository       = var.flux_chart_repository
+  chart            = var.flux_instance_chart_name
   create_namespace = false
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = 600
+  wait             = var.flux_helm_wait
+  wait_for_jobs    = var.flux_helm_wait_for_jobs
+  timeout          = var.flux_helm_timeout_seconds
 
   values = [
     templatefile("${path.module}/templates/flux-instance-values.yaml.tpl", {
@@ -105,6 +100,7 @@ resource "helm_release" "flux_instance" {
       git_path       = var.git_path
     })
   ]
+
   depends_on = [
     helm_release.flux_operator,
     kubernetes_secret_v1.flux_github_app

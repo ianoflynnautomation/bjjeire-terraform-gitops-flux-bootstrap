@@ -5,6 +5,5 @@ terraform {
     azuread    = { source = "hashicorp/azuread", version = "~> 3.8" }
     kubernetes = { source = "hashicorp/kubernetes", version = "~> 3.0" }
     helm       = { source = "hashicorp/helm", version = "~> 3.1" }
-    random     = { source = "hashicorp/random", version = "~> 3.9" }
   }
 }

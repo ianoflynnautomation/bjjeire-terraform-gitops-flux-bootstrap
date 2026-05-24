@@ -1,4 +1,3 @@
-
 data "azurerm_client_config" "current" {}
 
 data "azurerm_kubernetes_cluster" "aks" {
@@ -12,30 +11,30 @@ data "azurerm_key_vault" "kv" {
 }
 
 data "azurerm_user_assigned_identity" "flux_identity" {
-  name                = "uami-flux-${var.environment}-${var.location_short_name}"
+  name                = "${var.flux_uami_name_prefix}${var.environment}-${var.location_short_name}"
   resource_group_name = var.resource_group_name
 }
 
 data "azurerm_user_assigned_identity" "external_secrets_identity" {
-  name                = "uami-extsecrets-${var.environment}-${var.location_short_name}"
+  name                = "${var.external_secrets_uami_name_prefix}${var.environment}-${var.location_short_name}"
   resource_group_name = var.resource_group_name
 }
 
 data "azuread_application" "oauth2_proxy" {
-  display_name = "oauth2-proxy-${var.aks_cluster_name}"
+  display_name = "${var.oauth2_proxy_app_name_prefix}${var.aks_cluster_name}"
 }
 
 data "azurerm_key_vault_secret" "github_app_id" {
-  name         = "github-app-id"
+  name         = var.kv_secret_name_github_app_id
   key_vault_id = data.azurerm_key_vault.kv.id
 }
 
 data "azurerm_key_vault_secret" "github_app_installation_id" {
-  name         = "github-app-installation-id"
+  name         = var.kv_secret_name_github_app_installation_id
   key_vault_id = data.azurerm_key_vault.kv.id
 }
 
 data "azurerm_key_vault_secret" "github_app_private_key" {
-  name         = "github-app-private-key"
+  name         = var.kv_secret_name_github_app_private_key
   key_vault_id = data.azurerm_key_vault.kv.id
 }
