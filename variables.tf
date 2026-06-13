@@ -57,7 +57,24 @@ variable "private_email" {
 variable "cluster_domain" {
   type        = string
   default     = "cluster.local"
-  description = "DNS suffix exposed to workloads via the cluster-config ConfigMap."
+  description = "Per-cluster DNS suffix exposed to workloads via the cluster-config ConfigMap. Typically <environment>.<root_domain> (e.g. dev.bjjeire.com)."
+}
+
+variable "root_domain" {
+  type        = string
+  default     = ""
+  description = "Root DNS zone (e.g. bjjeire.com). Exposed as ROOT_DOMAIN in cluster-config. Templates compose single-level subdomains so they stay under Cloudflare Universal SSL's wildcard cert (*.<root_domain>)."
+  nullable    = false
+
+  validation {
+    condition = (
+      var.root_domain == "" || (
+        length(split(".", var.root_domain)) >= 2 &&
+        alltrue([for label in split(".", var.root_domain) : length(trimspace(label)) > 0])
+      )
+    )
+    error_message = "root_domain must be empty or a valid DNS zone with two or more non-empty labels (e.g. bjjeire.com)."
+  }
 }
 
 variable "oauth2_proxy_allowed_group_id" {
@@ -76,6 +93,34 @@ variable "external_secrets_uami_name_prefix" {
   type        = string
   default     = "uami-extsecrets-"
   description = "Prefix of the External Secrets UAMI. Composed as <prefix><environment>-<location_short_name>."
+  nullable    = false
+}
+
+variable "api_uami_name_prefix" {
+  type        = string
+  default     = "uami-bjjeire-api-"
+  description = "Prefix of the bjj-api workload identity UAMI. Composed as <prefix><environment>-<location_short_name>. Exposed as API_CLIENT_ID in workload-identity-config so the bjj-eire chart's API ServiceAccount can claim it."
+  nullable    = false
+}
+
+variable "tests_runner_uami_name_prefix" {
+  type        = string
+  default     = "uami-tests-runner-"
+  description = "Prefix of the ARC test-runner UAMI. Composed as <prefix><environment>-<location_short_name>. Exposed as TESTS_RUNNER_CLIENT_ID in workload-identity-config so the gha-runner-scale-set ServiceAccount can claim it via Workload Identity. Must match tests_runner_identity_name_prefix in the bjjeire-terraform-azurerm-aks stack."
+  nullable    = false
+}
+
+variable "bjjeire_api_app_name_prefix" {
+  type        = string
+  default     = "bjjeire-api-"
+  description = "Prefix of the bjjeire-api Entra app registration. Composed as <prefix><environment>. MUST match name_prefixes.api in the bjjeire-terraform-azurerm-aks stack — that stack is the source of truth for the display name. Exposed as API_AUDIENCE in cluster-config so Istio's RequestAuthentication can validate JWT 'aud' claims."
+  nullable    = false
+}
+
+variable "seeder_uami_name_prefix" {
+  type        = string
+  default     = "uami-bjjeire-seeder-"
+  description = "Prefix of the bjj-seeder workload identity UAMI. Composed as <prefix><environment>-<location_short_name>. Exposed as SEEDER_CLIENT_ID in workload-identity-config."
   nullable    = false
 }
 

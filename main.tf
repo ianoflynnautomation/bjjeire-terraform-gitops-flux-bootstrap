@@ -38,12 +38,14 @@ resource "kubernetes_config_map_v1" "cluster_config" {
     CLUSTER_ID                 = data.azurerm_kubernetes_cluster.aks.name
     RESOURCE_GROUP             = data.azurerm_kubernetes_cluster.aks.resource_group_name
     CLUSTER_DOMAIN             = var.cluster_domain
+    ROOT_DOMAIN                = var.root_domain
     KEY_VAULT_NAME             = data.azurerm_key_vault.kv.name
     TENANT_ID                  = data.azurerm_client_config.current.tenant_id
     AZURE_SUBSCRIPTION_ID      = data.azurerm_client_config.current.subscription_id
     PRIVATE_EMAIL              = var.private_email
     OAUTH2_PROXY_CLIENT_ID     = data.azuread_application.oauth2_proxy.client_id
     OAUTH2_PROXY_ALLOWED_GROUP = var.oauth2_proxy_allowed_group_id
+    API_AUDIENCE = data.azuread_application.bjjeire_api.identifier_uris[0]
   }
 }
 
@@ -56,6 +58,9 @@ resource "kubernetes_config_map_v1" "workload_identity_config" {
   data = {
     FLUX_CLIENT_ID             = data.azurerm_user_assigned_identity.flux_identity.client_id
     EXTERNAL_SECRETS_CLIENT_ID = data.azurerm_user_assigned_identity.external_secrets_identity.client_id
+    API_CLIENT_ID              = data.azurerm_user_assigned_identity.api_identity.client_id
+    SEEDER_CLIENT_ID           = data.azurerm_user_assigned_identity.seeder_identity.client_id
+    TESTS_RUNNER_CLIENT_ID     = data.azurerm_user_assigned_identity.tests_runner_identity.client_id
   }
 }
 
