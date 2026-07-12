@@ -1,0 +1,113 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    ":prHourlyLimit4",
+    ":prConcurrentLimit10",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "labels": ["dependencies", "renovate"],
+  "timezone": "Europe/Dublin",
+  "schedule": ["after 6am and before 10pm every weekday"],
+  "dependencyDashboardTitle": "Dependency Dashboard (Flux bootstrap: providers, Flux charts & manifests)",
+  "commitMessagePrefix": "chore(deps):",
+  "gitAuthor": "Renovate Bot <renovate@users.noreply.github.com>",
+  "prBodyNotes": [
+    "Flux operator/instance chart versions and the flux-operator-manifests OCI artifact drive the on-cluster Flux install — treat every bump as a potential cluster-wide change.",
+    "Every bump must pass the `terraform-quality` (fmt/validate/tflint) and `terraform-audit` (trivy) workflows and a `terraform plan` for dev before merge; promote dev → staging → prod."
+  ],
+  "enabledManagers": [
+    "terraform",
+    "github-actions",
+    "helm-values",
+    "custom.regex"
+  ],
+  "terraform": {
+    "managerFilePatterns": ["/\\.tf$/"]
+  },
+  "github-actions": {
+    "managerFilePatterns": ["/(^|/)\\.github/workflows/[^/]+\\.ya?ml$/"]
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Flux distribution version pinned in the flux-instance values template",
+      "managerFilePatterns": ["/templates/.*\\.ya?ml\\.tpl$/"],
+      "matchStrings": [
+        "version:\\s*\"?(?<currentValue>2\\.\\d+\\.\\d+)\"?"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "fluxcd/flux2",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    },
+    {
+      "customType": "regex",
+      "description": "Flux Operator manifests OCI artifact pinned in the flux-instance values template",
+      "managerFilePatterns": ["/templates/.*\\.ya?ml\\.tpl$/"],
+      "matchStrings": [
+        "artifact:\\s*\"oci://(?<depName>[^:\"]+):(?<currentValue>v[0-9][^\"]*)\""
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "description": "Flux Operator / Flux Instance Helm chart versions pinned via *_chart_version variable defaults",
+      "managerFilePatterns": ["/\\.tf$/"],
+      "matchStrings": [
+        "#\\s*renovate:\\s*chart=(?<depName>[^\\s]+)\\s+registry=(?<registryUrl>[^\\s]+)\\s*\\n\\s*default\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Flux distribution + operator manifests move together — group and require dashboard approval",
+      "matchManagers": ["custom.regex"],
+      "matchDepNames": ["fluxcd/flux2", "ghcr.io/controlplaneio-fluxcd/flux-operator-manifests"],
+      "groupName": "flux",
+      "addLabels": ["flux"],
+      "automerge": false,
+      "dependencyDashboardApproval": true
+    },
+    {
+      "description": "Flux Helm charts (flux-operator, flux-instance)",
+      "matchManagers": ["custom.regex", "helm-values"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["**flux-operator**", "**flux-instance**"],
+      "addLabels": ["flux-chart"],
+      "automerge": false
+    },
+    {
+      "description": "Terraform providers — group patch/minor to reduce PR noise",
+      "matchManagers": ["terraform"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "terraform-providers (non-major)",
+      "automerge": false
+    },
+    {
+      "description": "Major updates always need explicit review",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "addLabels": ["major-update"]
+    },
+    {
+      "description": "GitHub Actions — group patch/minor; no automerge (CI trust boundary)",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "github-actions",
+      "automerge": false
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "osvVulnerabilityAlerts": true
+}

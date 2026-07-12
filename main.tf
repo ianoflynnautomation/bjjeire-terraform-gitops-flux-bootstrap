@@ -45,7 +45,7 @@ resource "kubernetes_config_map_v1" "cluster_config" {
     PRIVATE_EMAIL              = var.private_email
     OAUTH2_PROXY_CLIENT_ID     = data.azuread_application.oauth2_proxy.client_id
     OAUTH2_PROXY_ALLOWED_GROUP = var.oauth2_proxy_allowed_group_id
-    API_AUDIENCE = data.azuread_application.bjjeire_api.identifier_uris[0]
+    API_AUDIENCE               = data.azuread_application.bjjeire_api.identifier_uris[0]
   }
 }
 
